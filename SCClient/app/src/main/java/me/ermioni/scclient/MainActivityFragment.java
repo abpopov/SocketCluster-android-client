@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 
 import me.ermioni.scclient.services.websocket.ISocketService;
 import me.ermioni.scclient.services.websocket.SocketService;
-import me.ermioni.scclient.services.websocket.adapter.WebSocketAdapter;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -18,7 +17,7 @@ public class MainActivityFragment extends Fragment {
     private final ISocketService wss;
 
     public MainActivityFragment() {
-        wss = new SocketService(new WebSocketAdapter());
+        wss = new SocketService(5, true);
     }
 
     @Override

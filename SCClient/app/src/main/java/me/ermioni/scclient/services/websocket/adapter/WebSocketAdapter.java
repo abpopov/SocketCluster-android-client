@@ -11,8 +11,9 @@ import com.neovisionaries.ws.client.WebSocketState;
 import java.util.List;
 import java.util.Map;
 
-import me.ermioni.scclient.services.websocket.socketcluster.ISocketClusterRequestProcessor;
-import me.ermioni.scclient.services.websocket.socketcluster.SocketClusterRequestProcessor;
+import me.ermioni.scclient.services.websocket.socketcluster.ISCResponseProccesor;
+import me.ermioni.scclient.services.websocket.socketcluster.SCResponseProcessor;
+import me.ermioni.scclient.services.websocket.socketcluster.callback.IResponseCallback;
 
 /**
  * Created by dark on 26.03.16.
@@ -21,10 +22,10 @@ public class WebSocketAdapter implements WebSocketListener {
 
     private final String TAG = this.getClass().getSimpleName();
 
-    private final ISocketClusterRequestProcessor scProcessor;
+    private final ISCResponseProccesor scProcessor;
 
-    public WebSocketAdapter() {
-        scProcessor = new SocketClusterRequestProcessor();
+    public WebSocketAdapter(IResponseCallback responseCallback) {
+        scProcessor = new SCResponseProcessor(responseCallback);
     }
 
     @Override
@@ -35,12 +36,13 @@ public class WebSocketAdapter implements WebSocketListener {
     @Override
     public void onConnected(WebSocket websocket, Map<String, List<String>> headers) throws Exception {
         Log.i(TAG, "onConnected()");
-        scProcessor.HandShake(websocket);
+        scProcessor.processTextResponse(websocket, "connected");
     }
 
     @Override
     public void onConnectError(WebSocket websocket, WebSocketException cause) throws Exception {
         Log.i(TAG, "onConnectError(" + cause.toString() + ")");
+        scProcessor.processTextResponse(websocket, "error");
     }
 
     @Override
@@ -86,7 +88,7 @@ public class WebSocketAdapter implements WebSocketListener {
     @Override
     public void onTextMessage(WebSocket websocket, String text) throws Exception {
         Log.i(TAG, "onTextMessage: " + text);
-        scProcessor.ProcessTextRequest(websocket, text);
+        scProcessor.processTextResponse(websocket, text);
     }
 
     @Override
