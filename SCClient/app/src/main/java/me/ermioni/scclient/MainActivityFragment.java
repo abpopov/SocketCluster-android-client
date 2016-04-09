@@ -5,14 +5,18 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import me.ermioni.scclient.services.ISCChannelListener;
 import me.ermioni.scclient.services.websocket.ISocketService;
 import me.ermioni.scclient.services.websocket.SocketService;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends Fragment implements ISCChannelListener {
+
+    private TextView twInfo;
 
     private final ISocketService wss;
 
@@ -42,7 +46,7 @@ public class MainActivityFragment extends Fragment {
         view.findViewById(R.id.btn_subscribe).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                wss.SubscribeNewChannel("test");
+                subscribe();
             }
         });
 
@@ -53,7 +57,17 @@ public class MainActivityFragment extends Fragment {
             }
         });
 
+        twInfo = (TextView)view.findViewById(R.id.tw_info);
+
         return view;
     }
 
+    private void subscribe() {
+        wss.SubscribeNewChannel("test", this);
+    }
+
+    @Override
+    public void onRecieveMessageInChannel(String channel, String message) {
+        twInfo.setText(message);
+    }
 }

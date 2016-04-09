@@ -5,9 +5,11 @@ package me.ermioni.scclient.services.websocket.socketcluster.requests;
  */
 public class PublishRequest extends BaseRequest {
 
-    public PublishRequest(int cid, String channelName, String message) {
+    public PublishRequest(int cid, String message) {
         super(cid);
         event = "#publish";
-        data = ""; //TODO:
+        data = message;
     }
+
+
 }

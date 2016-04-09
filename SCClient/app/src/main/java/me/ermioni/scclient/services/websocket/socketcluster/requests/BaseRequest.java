@@ -13,4 +13,20 @@ public class BaseRequest {
     public BaseRequest(int cid) {
         this.cid = cid;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BaseRequest that = (BaseRequest) o;
+
+        return cid == that.cid;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return cid;
+    }
 }

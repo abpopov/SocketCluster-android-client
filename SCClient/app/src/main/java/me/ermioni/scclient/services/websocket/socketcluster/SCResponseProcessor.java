@@ -7,11 +7,14 @@ import me.ermioni.scclient.services.websocket.SocketService;
 import me.ermioni.scclient.services.websocket.socketcluster.callback.IResponseCallback;
 import me.ermioni.scclient.services.websocket.socketcluster.requests.HandshakeRequest;
 import me.ermioni.scclient.services.websocket.socketcluster.requests.TokenRequest;
+import me.ermioni.scclient.services.websocket.socketcluster.responses.PublishResponse;
 
 /**
  * Created by dark on 27.03.16.
  */
 public class SCResponseProcessor implements ISCResponseProccesor {
+
+    private static final String RID = "rid";
 
     private static final String PING_REQUEST = "#1";
 
@@ -24,7 +27,7 @@ public class SCResponseProcessor implements ISCResponseProccesor {
 
     private static final String SET_AUTH_TOKEN_REQUEST = "#setAuthToken";
 
-    private static final String PUBLISH_REQUEST = "#publish";
+    private static final String PUBLISH_RESPONSE = "#publish";
 
 
     /* non static */
@@ -36,26 +39,33 @@ public class SCResponseProcessor implements ISCResponseProccesor {
 
     @Override
     public void processTextResponse(WebSocket ws, String text) {
-        switch (text) {
-            case PING_REQUEST: {
-                pong(ws);
-                break;
-            }
-            case CONNECTED: {
-                handShake(ws);
-                break;
-            }
-            case SET_AUTH_TOKEN_REQUEST: {
-                setAuthToken((new Gson()).fromJson(text, TokenRequest.class));
-                break;
-            }
-            case PUBLISH_REQUEST: {
-                responseCallback.onPublishCallback(ws, text);
-                break;
-            }
-            case ERROR: {
-                responseCallback.onErrorCallback(ws, text);
-                break;
+        if(text.startsWith(RID)) {
+            int rid = Integer.getInteger(text.substring(4));
+            responseCallback.onRecieved(ws, rid);
+        }
+        else {
+            switch (text) {
+                case PING_REQUEST: {
+                    pong(ws);
+                    break;
+                }
+                case CONNECTED: {
+                    handShake(ws);
+                    responseCallback.onConnected(ws, text);
+                    break;
+                }
+                case SET_AUTH_TOKEN_REQUEST: {
+                    setAuthToken((new Gson()).fromJson(text, TokenRequest.class));
+                    break;
+                }
+                case PUBLISH_RESPONSE: {
+                    responseCallback.onPublish((new Gson()).fromJson(text, PublishResponse.class));
+                    break;
+                }
+                case ERROR: {
+                    responseCallback.onError(ws, text);
+                    break;
+                }
             }
         }
     }
