@@ -225,6 +225,8 @@ public class SocketService implements ISocketService, IResponseCallback {
 
     private void reconnect() throws Exception {
         if(_reconnectTimes < _maxReconnectTimes) {
+            long time = (long)Math.random()%3000;
+            Thread.sleep(time);
             socket = socket.recreate().connect();
 
             ++_reconnectTimes;
